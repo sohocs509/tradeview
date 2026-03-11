@@ -1,0 +1,48 @@
+---
+# TradeView — Full distributed deployment playbook
+# Usage: ansible-playbook playbooks/tradeview-deploy.yml -i inventory/tradeview/hosts.yml
+#
+# Phases:
+#   Phase 1 (milo only):  --limit tradeview_api
+#   Phase 2 (data+ml):    --limit tradeview_data,tradeview_ml
+#   Full deploy:          (no limit)
+
+- name: TradeView — Data Layer (otto)
+  hosts: tradeview_data
+  become: yes
+  roles:
+    - tradeview_common
+    - tradeview_data
+
+- name: TradeView — ML Layer (pete)
+  hosts: tradeview_ml
+  become: yes
+  roles:
+    - tradeview_common
+    - tradeview_ml
+
+- name: TradeView — API Layer (milo)
+  hosts: tradeview_api
+  become: yes
+  roles:
+    - tradeview_common
+    - tradeview_api
+
+- name: TradeView — Godot Client (fw01)
+  hosts: tradeview_client
+  become: yes
+  roles:
+    - tradeview_client
+
+- name: TradeView — Deployment Summary
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Show service endpoints
+      debug:
+        msg:
+          - "TradeView API:    http://milo.local:8770"
+          - "TradeView Valkey: milo.local:6380"
+          - "TimescaleDB:      otto.local:5433"
+          - "ML Inference:     http://pete.local:8766"
+          - "Health check:     curl http://milo.local:8770/"

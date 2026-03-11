@@ -1,0 +1,54 @@
+---
+- name: Create Godot install directory
+  file:
+    path: "{{ godot_install_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Check if Godot is already installed
+  stat:
+    path: "{{ godot_install_dir }}/godot"
+  register: godot_binary
+
+- name: Download Godot {{ godot_version }} (x86_64 Linux)
+  when: not godot_binary.stat.exists
+  get_url:
+    url: "https://github.com/godotengine/godot/releases/download/{{ godot_version }}-stable/Godot_v{{ godot_version }}-stable_linux.x86_64.zip"
+    dest: /tmp/godot.zip
+    mode: "0644"
+
+- name: Unzip Godot
+  when: not godot_binary.stat.exists
+  unarchive:
+    src: /tmp/godot.zip
+    dest: "{{ godot_install_dir }}"
+    remote_src: yes
+
+- name: Rename Godot binary
+  when: not godot_binary.stat.exists
+  command: mv "{{ godot_install_dir }}/Godot_v{{ godot_version }}-stable_linux.x86_64" "{{ godot_install_dir }}/godot"
+
+- name: Make Godot executable
+  file:
+    path: "{{ godot_install_dir }}/godot"
+    mode: "0755"
+
+- name: Create symlink in /usr/local/bin
+  file:
+    src: "{{ godot_install_dir }}/godot"
+    dest: /usr/local/bin/godot
+    state: link
+
+- name: Deploy Godot project files
+  become_user: "{{ ansible_user }}"
+  file:
+    path: "{{ tradeview_godot_project }}"
+    state: directory
+    mode: "0755"
+
+- name: Sync Godot project from repo
+  become_user: "{{ ansible_user }}"
+  synchronize:
+    src: "{{ tradeview_project_root }}/godot_project/"
+    dest: "{{ tradeview_godot_project }}/"
+    delete: no

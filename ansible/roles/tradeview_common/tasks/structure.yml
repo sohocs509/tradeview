@@ -1,0 +1,25 @@
+---
+- name: Create project directory
+  file:
+    path: "{{ tradeview_project_root }}"
+    state: directory
+    owner: pi
+    group: pi
+    mode: "0755"
+
+- name: Clone or update TradeView repo
+  become_user: pi
+  git:
+    repo: "{{ tradeview_git_repo }}"
+    dest: "{{ tradeview_project_root }}"
+    version: "{{ tradeview_git_branch }}"
+    force: no
+  register: git_result
+
+- name: Create .env file from template
+  template:
+    src: env.j2
+    dest: "{{ tradeview_project_root }}/.env"
+    owner: pi
+    group: pi
+    mode: "0600"

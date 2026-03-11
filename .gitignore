@@ -1,0 +1,11 @@
+.env
+*.pyc
+__pycache__/
+*.pkl
+/data/
+/backend/ml/models/
+.godot/
+*.import
+export_presets.cfg
+.ansible-vault-password
+*.log

@@ -1,0 +1,47 @@
+# Phase 2: Data ingestion + TimescaleDB on otto.local
+# Port 5432 on otto is occupied by pgvector — TimescaleDB runs on 5433
+
+services:
+  tradeview-timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: tradeview-timescaledb
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=${TV_DB_USER:-tradeview}
+      - POSTGRES_PASSWORD=${TV_DB_PASSWORD}
+      - POSTGRES_DB=tradeview
+    volumes:
+      - tradeview-tsdb-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    restart: unless-stopped
+    networks:
+      - tradeview-net
+
+  tradeview-fetcher:
+    build:
+      context: ../../backend/data
+      dockerfile: Dockerfile
+    image: tradeview-fetcher:latest
+    container_name: tradeview-fetcher
+    environment:
+      - TV_DB_HOST=tradeview-timescaledb
+      - TV_DB_PORT=5432
+      - TV_DB_USER=${TV_DB_USER:-tradeview}
+      - TV_DB_PASSWORD=${TV_DB_PASSWORD}
+      - TV_DB_NAME=tradeview
+      - TV_VALKEY_HOST=${TV_VALKEY_HOST:-milo.local}
+      - TV_VALKEY_PORT=${TV_VALKEY_PORT:-6380}
+      - TV_FETCH_INTERVAL=${TV_FETCH_INTERVAL:-300}
+    depends_on:
+      - tradeview-timescaledb
+    restart: unless-stopped
+    networks:
+      - tradeview-net
+
+volumes:
+  tradeview-tsdb-data:
+
+networks:
+  tradeview-net:
+    name: tradeview-net

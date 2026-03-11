@@ -1,0 +1,36 @@
+services:
+  tradeview-api:
+    build:
+      context: ../../backend/api
+      dockerfile: Dockerfile
+    image: tradeview-api:latest
+    container_name: tradeview-api
+    ports:
+      - "8770:8770"
+    environment:
+      - TV_API_PORT=8770
+      - TV_VALKEY_HOST=tradeview-valkey
+      - TV_VALKEY_PORT=6379
+    depends_on:
+      - tradeview-valkey
+    restart: unless-stopped
+    networks:
+      - tradeview-net
+
+  tradeview-valkey:
+    image: valkey/valkey:8-alpine
+    container_name: tradeview-valkey
+    ports:
+      - "6380:6379"
+    volumes:
+      - tradeview-valkey-data:/data
+    restart: unless-stopped
+    networks:
+      - tradeview-net
+
+volumes:
+  tradeview-valkey-data:
+
+networks:
+  tradeview-net:
+    name: tradeview-net

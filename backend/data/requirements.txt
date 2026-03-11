@@ -1,0 +1,5 @@
+yfinance==0.2.51
+pandas==2.2.3
+numpy==1.26.4
+psycopg2-binary==2.9.10
+valkey==6.0.2

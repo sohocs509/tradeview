@@ -1,0 +1,6 @@
+---
+- name: Include prerequisite tasks
+  import_tasks: prerequisites.yml
+
+- name: Include project structure tasks
+  import_tasks: structure.yml

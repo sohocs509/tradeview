@@ -1,0 +1,25 @@
+# Phase 2: ML training + inference on pete.local
+# Note: pete uses Podman — run with: podman compose up -d
+
+services:
+  tradeview-ml:
+    build:
+      context: ../../backend/ml
+      dockerfile: Dockerfile
+    image: tradeview-ml:latest
+    container_name: tradeview-ml
+    ports:
+      - "8766:8766"
+    environment:
+      - TV_ML_PORT=8766
+      - TV_DB_HOST=${TV_DB_HOST:-otto.local}
+      - TV_DB_PORT=${TV_DB_PORT:-5433}
+      - TV_DB_USER=${TV_DB_USER:-tradeview}
+      - TV_DB_PASSWORD=${TV_DB_PASSWORD}
+      - TV_DB_NAME=tradeview
+    volumes:
+      - tradeview-models:/data/models
+    restart: unless-stopped
+
+volumes:
+  tradeview-models:

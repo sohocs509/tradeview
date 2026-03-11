@@ -1,0 +1,95 @@
+[gd_scene load_steps=7 format=3 uid="uid://main001"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/market_client.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/candlestick_chart.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/indicator_panel.gd" id="4"]
+
+[sub_resource type="StyleBoxFlat" id="panel_bg"]
+bg_color = Color(0.08, 0.09, 0.11, 1)
+
+[sub_resource type="StyleBoxFlat" id="topbar_bg"]
+bg_color = Color(0.1, 0.11, 0.13, 1)
+border_width_bottom = 1
+border_color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1")
+
+[node name="MarketClient" type="Node" parent="."]
+script = ExtResource("2")
+
+[node name="MainLayout" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="TopBar" type="HBoxContainer" parent="MainLayout"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_override_styles/panel = SubResource("topbar_bg")
+theme_override_constants/separation = 12
+
+[node name="SymbolInput" type="LineEdit" parent="MainLayout/TopBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(120, 0)
+placeholder_text = "Symbol (e.g. SPY)"
+text = "SPY"
+
+[node name="ConnectBtn" type="Button" parent="MainLayout/TopBar"]
+layout_mode = 2
+text = "Connect"
+
+[node name="StatusLabel" type="Label" parent="MainLayout/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Disconnected"
+
+[node name="SMAToggle" type="CheckButton" parent="MainLayout/TopBar"]
+layout_mode = 2
+text = "SMA"
+button_pressed = true
+
+[node name="BBToggle" type="CheckButton" parent="MainLayout/TopBar"]
+layout_mode = 2
+text = "Bollinger"
+button_pressed = true
+
+[node name="SignalLabel" type="Label" parent="MainLayout/TopBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+horizontal_alignment = 2
+text = "ML: --"
+
+[node name="ChartArea" type="PanelContainer" parent="MainLayout"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 5.0
+theme_override_styles/panel = SubResource("panel_bg")
+
+[node name="CandlestickChart" type="Control" parent="MainLayout/ChartArea"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("3")
+
+[node name="RSIPanel" type="Control" parent="MainLayout"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 120)
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.0
+script = ExtResource("4")
+mode = 0
+
+[node name="MACDPanel" type="Control" parent="MainLayout"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 120)
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.0
+script = ExtResource("4")
+mode = 1

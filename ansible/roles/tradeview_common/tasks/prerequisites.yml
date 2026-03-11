@@ -1,0 +1,44 @@
+---
+- name: Install required packages
+  apt:
+    name:
+      - git
+      - curl
+      - python3-pip
+    state: present
+    update_cache: yes
+
+- name: Check if Docker is installed
+  command: docker --version
+  register: docker_check
+  ignore_errors: yes
+  changed_when: false
+
+- name: Install Docker (if missing)
+  when: docker_check.rc != 0 and compose_cmd == 'docker compose'
+  block:
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Add Docker apt repository
+      apt_repository:
+        repo: "deb [arch=arm64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Install Docker CE
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+        update_cache: yes
+
+    - name: Add pi user to docker group
+      user:
+        name: pi
+        groups: docker
+        append: yes

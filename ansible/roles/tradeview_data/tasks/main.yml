@@ -1,0 +1,20 @@
+---
+- name: Start TimescaleDB + data fetcher
+  become_user: pi
+  community.docker.docker_compose_v2:
+    project_src: "{{ tradeview_project_root }}"
+    files:
+      - "{{ tradeview_compose_file }}"
+    state: present
+    build: always
+    pull: missing
+
+- name: Wait for TimescaleDB to be ready
+  wait_for:
+    host: localhost
+    port: "{{ tradeview_tsdb_port }}"
+    timeout: 60
+
+- name: Confirm TimescaleDB is up
+  debug:
+    msg: "TradeView TimescaleDB is up at {{ inventory_hostname }}:{{ tradeview_tsdb_port }}"

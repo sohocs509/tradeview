@@ -1,0 +1,23 @@
+---
+- name: Build and start TradeView API + Valkey
+  become_user: pi
+  community.docker.docker_compose_v2:
+    project_src: "{{ tradeview_project_root }}"
+    files:
+      - "{{ tradeview_compose_file }}"
+    state: present
+    build: always
+    pull: missing
+
+- name: Wait for API to be ready
+  uri:
+    url: "http://localhost:{{ tradeview_api_port }}/"
+    status_code: 200
+  register: health
+  until: health.status == 200
+  retries: 15
+  delay: 5
+
+- name: Confirm API is up
+  debug:
+    msg: "TradeView API is up at http://{{ inventory_hostname }}:{{ tradeview_api_port }}"

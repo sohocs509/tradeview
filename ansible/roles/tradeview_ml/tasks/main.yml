@@ -1,0 +1,19 @@
+---
+- name: Start ML inference service
+  become_user: pi
+  shell: "{{ compose_cmd }} -f {{ tradeview_project_root }}/{{ tradeview_compose_file }} up -d --build"
+  args:
+    chdir: "{{ tradeview_project_root }}"
+
+- name: Wait for ML API to be ready
+  uri:
+    url: "http://localhost:{{ tradeview_ml_port }}/"
+    status_code: 200
+  register: health
+  until: health.status == 200
+  retries: 15
+  delay: 5
+
+- name: Confirm ML service is up
+  debug:
+    msg: "TradeView ML inference is up at http://{{ inventory_hostname }}:{{ tradeview_ml_port }}"
