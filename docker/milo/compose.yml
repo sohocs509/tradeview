@@ -28,8 +28,32 @@ services:
     networks:
       - tradeview-net
 
+  tradeview-ml-fallback:
+    build:
+      context: ../../backend/ml
+      dockerfile: Dockerfile
+    image: tradeview-ml:latest
+    container_name: tradeview-ml-fallback
+    ports:
+      - "8767:8766"
+    environment:
+      - TV_ML_PORT=8766
+      - TV_DB_HOST=${TV_DB_HOST:-otto.local}
+      - TV_DB_PORT=${TV_DB_PORT:-5433}
+      - TV_DB_USER=${TV_DB_USER:-tradeview}
+      - TV_DB_PASSWORD=${TV_DB_PASSWORD}
+      - TV_DB_NAME=tradeview
+    volumes:
+      - tradeview-models-fallback:/data/models
+    restart: unless-stopped
+    networks:
+      - tradeview-net
+    profiles:
+      - fallback
+
 volumes:
   tradeview-valkey-data:
+  tradeview-models-fallback:
 
 networks:
   tradeview-net:
