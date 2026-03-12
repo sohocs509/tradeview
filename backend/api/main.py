@@ -14,7 +14,7 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
-import pandas_ta as ta
+import ta_indicators
 import yfinance as yf
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
 from fastapi.middleware.cors import CORSMiddleware
