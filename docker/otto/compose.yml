@@ -20,7 +20,7 @@ services:
 
   tradeview-fetcher:
     build:
-      context: ../../backend/data
+      context: ./backend/data
       dockerfile: Dockerfile
     image: tradeview-fetcher:latest
     container_name: tradeview-fetcher
@@ -30,8 +30,8 @@ services:
       - TV_DB_USER=${TV_DB_USER:-tradeview}
       - TV_DB_PASSWORD=${TV_DB_PASSWORD}
       - TV_DB_NAME=tradeview
-      - TV_VALKEY_HOST=${TV_VALKEY_HOST:-milo.local}
-      - TV_VALKEY_PORT=${TV_VALKEY_PORT:-6380}
+      - TV_VALKEY_HOST=${TV_VALKEY_HOST:-tradeview-valkey}
+      - TV_VALKEY_PORT=${TV_VALKEY_PORT:-6379}
       - TV_FETCH_INTERVAL=${TV_FETCH_INTERVAL:-300}
     depends_on:
       - tradeview-timescaledb
